@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicle Management</title>
+</head>
+<body>
+
+<h2>Vehicle Management System</h2>
+
+<input id="brand" placeholder="Brand"><br><br>
+<input id="model" placeholder="Model"><br><br>
+<input id="number" placeholder="Vehicle Number"><br><br>
+<input id="price" placeholder="Price"><br><br>
+
+<button onclick="addVehicle()">Add Vehicle</button>
+
+<h3>Vehicle List</h3>
+<ul id="list"></ul>
+
+<script>
+const api = "http://localhost:8080/vehicles";
+
+function addVehicle() {
+    fetch(api, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            brand: brand.value,
+            model: model.value,
+            number: number.value,
+            price: price.value
+        })
+    }).then(() => loadVehicles());
+}
+
+function loadVehicles() {
+    fetch(api)
+        .then(res => res.json())
+        .then(data => {
+            list.innerHTML = "";
+            data.forEach(v => {
+                list.innerHTML += `
+                <li>
+                    ${v.brand} - ${v.model} - ₹${v.price}
+                    <button onclick="deleteVehicle(${v.id})">Delete</button>
+                </li>`;
+            });
+        });
+}
+
+function deleteVehicle(id) {
+    fetch(api + "/" + id, { method: "DELETE" })
+        .then(() => loadVehicles());
+}
+
+loadVehicles();
+</script>
+
+</body>
+</html>
